@@ -51,7 +51,7 @@ No treino, a temperatura ficou em torno de 24 °C, e o pico só era marcado com 
 
 ### Portal web (`web/`)
 
-Portal em React + Vite, trazido das fases anteriores. O login é simulado: `medico@cardioia.com` / `123456` gera um token guardado no navegador e libera leituras, pacientes, consultas, novo agendamento e o assistente. Pacientes e consultas leem registros fictícios em `src/services/mockData.js`. A página Leituras envia os dois casos para `POST /api/risco`, guarda as últimas 20 respostas e abre o detalhe ao clicar: horário, temperatura, batimento, probabilidade, classe e protocolos. A página Assistente envia a frase para `POST /api/chat`. O `vercel.json` pede à Vercel que entregue `index.html` em qualquer endereço, para rotas como `/leituras` abrirem direto.
+Portal em React + Vite, trazido das fases anteriores. O login é simulado: `medico@cardioia.com` / `123456` gera um token guardado no navegador e libera leituras, pacientes, consultas, novo agendamento e o assistente. Pacientes e consultas leem registros fictícios em `src/services/mockData.js`. A página Leituras lista o que o sensor enviou para `POST /api/risco`. O clique abre horário, temperatura, batimento, probabilidade, classe e protocolos. A página Assistente envia a frase para `POST /api/chat`. O `vercel.json` pede à Vercel que entregue `index.html` em qualquer endereço, para rotas como `/leituras` abrirem direto.
 
 ### Aplicativo (`mobile/`)
 
