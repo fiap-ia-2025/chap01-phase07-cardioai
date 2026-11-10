@@ -1,0 +1,101 @@
+.container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.appointmentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.appointmentItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #ecf0f1;
+  flex-wrap: wrap;
+}
+
+.appointmentItem:last-child {
+  border-bottom: none;
+}
+
+.patientInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.patientName {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 1rem;
+}
+
+.timeInfo {
+  color: #7f8c8d;
+  font-size: 0.85rem;
+}
+
+.diagnosis {
+  color: #34495e;
+  font-size: 0.9rem;
+}
+
+.status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.confirmada {
+  background: #d4edda;
+  color: #155724;
+}
+
+.pendente {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.empty {
+  text-align: center;
+  padding: 2rem;
+  color: #7f8c8d;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .appointmentItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .patientInfo {
+    width: 100%;
+  }
+
+  .status {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .appointmentItem {
+    padding: 0.75rem;
+  }
+
+  .patientName {
+    font-size: 0.95rem;
+  }
+
+  .timeInfo,
+  .diagnosis {
+    font-size: 0.8rem;
+  }
+}

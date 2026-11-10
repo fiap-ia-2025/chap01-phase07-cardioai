@@ -1,0 +1,94 @@
+.chat {
+  max-width: 760px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.title {
+  margin-bottom: 1.5rem;
+  color: #2c3e50;
+  font-size: 1.8rem;
+}
+
+.painel {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.mensagens {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 280px;
+  max-height: 460px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.assistente,
+.paciente {
+  max-width: 80%;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  white-space: pre-wrap;
+}
+
+.assistente {
+  align-self: flex-start;
+  background: #f4f6fb;
+  color: #2c3e50;
+}
+
+.paciente {
+  align-self: flex-end;
+  background: #667eea;
+  color: white;
+}
+
+.assistente p,
+.paciente p {
+  margin: 0;
+}
+
+.origem {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  color: #7f8c8d;
+}
+
+.form {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.campo {
+  flex: 1;
+  border: 1px solid #d9dde7;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  font: inherit;
+}
+
+.botao {
+  background: #667eea;
+  color: white;
+  border: 0;
+  border-radius: 8px;
+  padding: 0.8rem 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.botao:disabled,
+.campo:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.erro {
+  color: #e74c3c;
+  margin: 0.75rem 0 0;
+}

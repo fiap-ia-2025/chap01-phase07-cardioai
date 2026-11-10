@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "author": "Equipe CardioIA - FIAP",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-dht22", "id": "dht1", "top": -182.1, "left": 13.8, "attrs": {} },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": 15.8,
+      "left": -124.8,
+      "attrs": { "color": "green", "xray": "1" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": 28.4,
+      "left": 205.2,
+      "attrs": { "color": "red" }
+    }
+  ],
+  "connections": [
+    ["esp:TX", "$serialMonitor:RX", "", []],
+    ["esp:RX", "$serialMonitor:TX", "", []],
+    ["dht1:VCC", "esp:3V3", "red", ["v0"]],
+    ["dht1:SDA", "esp:4", "blue", ["v48", "h86.5", "v201.6"]],
+    ["dht1:GND", "esp:GND.2", "black", ["v38.4", "h86.4", "v57.6"]],
+    ["esp:15", "btn1:1.l", "green", ["h0"]],
+    ["btn1:2.r", "esp:GND.2", "black", ["v0"]],
+    ["esp:2", "led1:A", "red", ["h0"]],
+    ["led1:C", "esp:GND.1", "black", ["v0"]]
+  ],
+  "dependencies": {}
+}

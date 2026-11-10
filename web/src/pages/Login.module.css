@@ -1,0 +1,143 @@
+.loginContainer {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 1rem;
+}
+
+.loginCard {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: 400px;
+  max-width: 100%;
+}
+
+.logoSection {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logoSection h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.logoSection p {
+  margin: 0.5rem 0 0;
+  opacity: 0.9;
+}
+
+.loginForm {
+  padding: 2rem;
+}
+
+.loginForm h2 {
+  margin: 0 0 1.5rem;
+  color: #2c3e50;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #34495e;
+  font-weight: 500;
+}
+
+.formGroup input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #ecf0f1;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.formGroup input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.loginBtn {
+  width: 100%;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.loginBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.loginBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.error {
+  background: #fee;
+  color: #c33;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.demoInfo {
+  margin-top: 1rem;
+  text-align: center;
+  color: #7f8c8d;
+  font-size: 0.9rem;
+}
+
+/* Responsividade do Login */
+@media (max-width: 480px) {
+  .loginContainer {
+    padding: 0.5rem;
+  }
+
+  .logoSection {
+    padding: 1.5rem;
+  }
+
+  .logoSection h1 {
+    font-size: 1.5rem;
+  }
+
+  .logoSection p {
+    font-size: 0.9rem;
+  }
+
+  .loginForm {
+    padding: 1.5rem;
+  }
+
+  .loginForm h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+
+  .formGroup input {
+    padding: 0.6rem;
+    font-size: 0.95rem;
+  }
+
+  .loginBtn {
+    padding: 0.6rem;
+  }
+}
