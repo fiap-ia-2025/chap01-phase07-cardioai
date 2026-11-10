@@ -105,7 +105,7 @@ A página Assistente envia a frase para `POST /api/chat`. Com as credenciais da 
 | `backend/` | API, modelo treinado e regras de protocolo |
 | `web/` | Portal em React + Vite |
 | `mobile/` | Aplicativo em Expo |
-| `docs/` | Pasta reservada ao relatório em PDF |
+| `docs/` | Relatório de arquitetura em `relatorio-cardioia.md` e `relatorio-cardioia.pdf` |
 
 ### Sensor (`iot/`)
 

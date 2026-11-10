@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="980" viewBox="0 0 1080 980">
+  <defs>
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#667EEA"/>
+    </marker>
+  </defs>
+  <style>
+    text { font-family: Helvetica, Arial, sans-serif; }
+    .caixa { font-size: 15px; font-weight: 700; fill: #2C3E50; }
+    .sub { font-size: 12px; fill: #5D6D7E; }
+    .seta { font-size: 12px; fill: #3D4F8C; }
+    .grupo { font-size: 13px; font-weight: 700; fill: #667EEA; }
+  </style>
+  <rect width="1080" height="980" fill="#ffffff"/>
+
+  <rect x="36" y="16" width="1020" height="268" rx="12" fill="#F7F8FC" stroke="#D5DCE8"/>
+  <text class="grupo" x="56" y="42">1. Circuito no Wokwi</text>
+
+  <rect x="60" y="64" width="220" height="78" rx="8" fill="#F4F6FB" stroke="#2C3E50"/>
+  <text class="caixa" x="76" y="94">DHT22</text>
+  <text class="sub" x="76" y="116">GPIO 4 · temperatura e umidade</text>
+
+  <rect x="60" y="176" width="220" height="78" rx="8" fill="#F4F6FB" stroke="#2C3E50"/>
+  <text class="caixa" x="76" y="206">Botão</text>
+  <text class="sub" x="76" y="228">GPIO 15 · pulsos do batimento</text>
+
+  <rect x="400" y="112" width="250" height="96" rx="8" fill="#EEF1FF" stroke="#667EEA" stroke-width="1.5"/>
+  <text class="caixa" x="416" y="148">ESP32</text>
+  <text class="sub" x="416" y="170">MicroPython · main.py</text>
+  <text class="sub" x="416" y="188">lê, calcula o bpm e aciona o LED</text>
+
+  <rect x="800" y="64" width="220" height="78" rx="8" fill="#F4F6FB" stroke="#2C3E50"/>
+  <text class="caixa" x="816" y="94">LED</text>
+  <text class="sub" x="816" y="116">GPIO 2 · alerta no circuito</text>
+
+  <rect x="800" y="176" width="220" height="78" rx="8" fill="#F4F6FB" stroke="#2C3E50"/>
+  <text class="caixa" x="816" y="206">Fila local</text>
+  <text class="sub" x="816" y="228">até 100 amostras</text>
+
+  <line x1="280" y1="103" x2="400" y2="145" stroke="#667EEA" stroke-width="1.6" marker-end="url(#seta)"/>
+  <line x1="280" y1="215" x2="400" y2="175" stroke="#667EEA" stroke-width="1.6" marker-end="url(#seta)"/>
+  <line x1="650" y1="145" x2="800" y2="103" stroke="#667EEA" stroke-width="1.6" marker-end="url(#seta)"/>
+  <line x1="650" y1="180" x2="800" y2="215" stroke="#667EEA" stroke-width="1.6" marker-end="url(#seta)"/>
+  <text class="seta" x="312" y="112">leitura</text>
+  <text class="seta" x="312" y="214">pulsos</text>
+  <text class="seta" x="690" y="118">limite</text>
+  <text class="seta" x="690" y="214">amostra</text>
+
+  <path d="M 910 254 L 910 330 L 760 390" fill="none" stroke="#667EEA" stroke-width="1.6" marker-end="url(#seta)"/>
+  <text class="seta" x="560" y="352">POST /api/risco · temp, bpm e umid</text>
+
+  <rect x="360" y="390" width="400" height="72" rx="8" fill="#EEF1FF" stroke="#667EEA" stroke-width="1.5"/>
+  <text class="caixa" x="376" y="420">API Flask</text>
+  <text class="sub" x="376" y="442">app.py · completa os campos e publica as rotas</text>
+
+  <path d="M 560 462 L 560 496 L 185 496 L 185 566" fill="none" stroke="#667EEA" stroke-width="1.6" marker-end="url(#seta)"/>
+
+  <rect x="36" y="520" width="1008" height="150" rx="12" fill="#F7F8FC" stroke="#D5DCE8"/>
+  <text class="grupo" x="56" y="546">2. Decisão em Python · a resposta oficial nasce aqui</text>
+
+  <rect x="60" y="566" width="250" height="78" rx="8" fill="#F4F6FB" stroke="#2C3E50"/>
+  <text class="caixa" x="76" y="596">Ýrvore de decisão</text>
+  <text class="sub" x="76" y="618">model.py · probabilidade e classe</text>
+
+  <rect x="390" y="566" width="270" height="78" rx="8" fill="#F4F6FB" stroke="#2C3E50"/>
+  <text class="caixa" x="406" y="596">Regras de protocolo</text>
+  <text class="sub" x="406" y="618">agentes.py · dez condições</text>
+
+  <rect x="740" y="566" width="276" height="78" rx="8" fill="#F4F6FB" stroke="#2C3E50"/>
+  <text class="caixa" x="756" y="596">Validação e histórico</text>
+  <text class="sub" x="756" y="618">confere a saída · guarda 20 análises</text>
+
+  <line x1="310" y1="605" x2="390" y2="605" stroke="#667EEA" stroke-width="1.6" marker-end="url(#seta)"/>
+  <line x1="660" y1="605" x2="740" y2="605" stroke="#667EEA" stroke-width="1.6" marker-end="url(#seta)"/>
+
+  <path d="M 360 426 L 24 426 L 24 774 L 60 774" fill="none" stroke="#667EEA" stroke-width="1.6" marker-end="url(#seta)"/>
+  <text class="seta" x="40" y="416">POST /api/chat</text>
+
+  <line x1="878" y1="644" x2="878" y2="748" stroke="#667EEA" stroke-width="1.6" marker-end="url(#seta)"/>
+  <text class="seta" x="700" y="708">POST /api/relatorio · sob pedido</text>
+
+  <rect x="60" y="748" width="360" height="72" rx="8" fill="#F4F6FB" stroke="#2C3E50"/>
+  <text class="caixa" x="76" y="776">Watson Assistant</text>
+  <text class="sub" x="76" y="798">responde o chat · não calcula o risco</text>
+
+  <rect x="700" y="748" width="344" height="72" rx="8" fill="#F4F6FB" stroke="#2C3E50"/>
+  <text class="caixa" x="716" y="776">Quatro agentes</text>
+  <text class="sub" x="716" y="798">redigem o relatório da leitura já calculada</text>
+
+  <rect x="60" y="860" width="470" height="86" rx="8" fill="#EEF1FF" stroke="#667EEA"/>
+  <text class="caixa" x="76" y="892">Portal web</text>
+  <text class="sub" x="76" y="914">Leituras e Assistente</text>
+  <text class="sub" x="76" y="932">GET /api/historico · POST /api/chat · POST /api/relatorio</text>
+
+  <rect x="580" y="860" width="464" height="86" rx="8" fill="#EEF1FF" stroke="#667EEA"/>
+  <text class="caixa" x="596" y="892">Aplicativo Android</text>
+  <text class="sub" x="596" y="914">Leituras</text>
+  <text class="sub" x="596" y="932">GET /api/historico</text>
+</svg>
