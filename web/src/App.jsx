@@ -30,9 +30,10 @@ function AppContent() {
                       <Routes>
                         <Route
                           path="/"
-                          element={<Navigate to="/dashboard" replace />}
+                          element={<Navigate to="/leituras" replace />}
                         />
-                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/dashboard" element={<Navigate to="/leituras" replace />} />
+                        <Route path="/leituras" element={<Dashboard />} />
                         <Route path="/patients" element={<Patients />} />
                         <Route
                           path="/appointments"

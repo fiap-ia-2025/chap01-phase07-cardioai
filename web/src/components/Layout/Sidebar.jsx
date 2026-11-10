@@ -3,7 +3,7 @@ import styles from "./Sidebar.module.css";
 
 export const Sidebar = () => {
   const menuItems = [
-    { path: "/dashboard", label: "Dashboard", icon: "📊" },
+    { path: "/leituras", label: "Leituras", icon: "💓" },
     { path: "/patients", label: "Pacientes", icon: "👥" },
     { path: "/appointments", label: "Consultas", icon: "📅" },
     { path: "/new-appointment", label: "Nova Consulta", icon: "➕" },

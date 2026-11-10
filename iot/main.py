@@ -3,7 +3,10 @@
 # agora em MicroPython. O LED acende quando algum limite clínico estoura.
 
 import machine
+import network
 import time
+import ujson
+import urequests
 import dht
 
 PINO_DHT = 4
@@ -19,6 +22,8 @@ INTERVALO_WIFI_MS = 15000
 TEMP_ALERTA = 38.0
 BPM_ALERTA = 120
 UMID_ALERTA = 90.0
+
+API_URL = "https://chap01-phase07-cardioai.onrender.com/api/risco"
 
 sensor = dht.DHT22(machine.Pin(PINO_DHT))
 botao = machine.Pin(PINO_BOTAO, machine.Pin.IN, machine.Pin.PULL_UP)
@@ -85,12 +90,60 @@ def linha_json(amostra):
     )
 
 
+def conectar_simulador():
+    """A rede Wokwi-GUEST é a internet do simulador. Fica ligada o tempo todo."""
+    estacao = network.WLAN(network.STA_IF)
+    estacao.active(True)
+    if estacao.isconnected():
+        return
+    print("[WIFI] Ligando na rede do simulador...")
+    estacao.connect("Wokwi-GUEST", "")
+    inicio = time.ticks_ms()
+    while not estacao.isconnected():
+        if time.ticks_diff(time.ticks_ms(), inicio) > 15000:
+            print("[WIFI] Sem rede do simulador. As leituras ficam no buffer.")
+            return
+        time.sleep_ms(200)
+    print("[WIFI] Rede do simulador pronta.")
+
+
+def enviar(amostra):
+    corpo = ujson.dumps(
+        {"temp": amostra["temp"], "bpm": amostra["bpm"], "umid": amostra["umid"]}
+    )
+    resposta = None
+    try:
+        resposta = urequests.post(
+            API_URL,
+            data=corpo,
+            headers={"Content-Type": "application/json"},
+        )
+        print("[HTTP]", resposta.status_code, resposta.text)
+        if resposta.status_code == 200:
+            return "ok"
+        return "recusada"
+    except OSError as erro:
+        print("[HTTP] falha de rede", erro)
+        return "rede"
+    finally:
+        if resposta is not None:
+            resposta.close()
+
+
 def sincronizar():
     if not buffer:
         return
     print("[NUVEM] Sincronizando", len(buffer), "amostras pendentes.")
     while buffer:
-        print("[MQTT->NUVEM]", linha_json(buffer.pop(0)))
+        resultado = enviar(buffer[0])
+        if resultado == "rede":
+            print("[NUVEM] Parei no meio. O restante continua no buffer.")
+            return
+        amostra = buffer.pop(0)
+        if resultado == "ok":
+            print("[HTTP->NUVEM]", linha_json(amostra))
+        else:
+            print("[NUVEM] Leitura recusada e descartada.", linha_json(amostra))
     print("[NUVEM] Buffer limpo.")
 
 
@@ -106,7 +159,8 @@ def simular_wifi():
 
 
 print("CardioIA - Monitor Cardiaco - MicroPython")
-print("[INFO] Buffer offline: 100 amostras. Wi-Fi inicia desconectado.")
+print("[INFO] Buffer offline: 100 amostras. O link com a API inicia desligado.")
+conectar_simulador()
 
 while True:
     simular_wifi()
@@ -135,7 +189,13 @@ while True:
 
         if wifi_conectado:
             sincronizar()
-            print("[MQTT->NUVEM]", linha_json(amostra))
+            resultado = enviar(amostra)
+            if resultado == "ok":
+                print("[HTTP->NUVEM]", linha_json(amostra))
+            elif resultado == "recusada":
+                print("[NUVEM] Leitura recusada e descartada.", linha_json(amostra))
+            else:
+                adicionar_ao_buffer(amostra)
         else:
             adicionar_ao_buffer(amostra)
             aviso = " | ALERTA CLINICO" if amostra["alerta"] else ""

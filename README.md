@@ -27,7 +27,7 @@ Dados e modelos são simulados, para uso acadêmico. O sistema não substitui av
 Sensor no Wokwi → API Python → modelo e protocolos → portal web e app Android
 ```
 
-O sensor mede temperatura, batimento e umidade. A API completa os campos que o sensor não mede, consulta a árvore de decisão treinada na Fase 6 e devolve três informações: probabilidade de pico, classe (alto ou baixo risco) e protocolos acionados. O aplicativo consome essa resposta em `/api/risco`. O portal consome o chat em `/api/chat`. No Wokwi, o sensor imprime o JSON no monitor serial. O envio HTTP do sensor para a API ainda não está ligado.
+O sensor mede temperatura, batimento e umidade. A API completa os campos que o sensor não mede, consulta a árvore de decisão treinada na Fase 6 e devolve três informações: probabilidade de pico, classe (alto ou baixo risco) e protocolos acionados. O aplicativo e a página Leituras do portal consomem essa resposta em `/api/risco`. A página Assistente consome o chat em `/api/chat`. No Wokwi, o sensor guarda a leitura enquanto o link simulado está desligado. Quando o link volta, envia `temp`, `bpm` e `umid` para a API pública.
 
 ## Módulos
 
@@ -37,7 +37,7 @@ O sensor mede temperatura, batimento e umidade. A API completa os campos que o s
 
 A cada 2 segundos o script lê temperatura e umidade no DHT22. O botão conta pulsos. A cada 5 segundos essa contagem vira batimentos por minuto (pulsos × 12). Acima de 38 °C, 120 bpm ou 90% de umidade, o LED acende.
 
-Enquanto a conexão simulada está desligada, a leitura entra num buffer de até 100 amostras. A cada 15 segundos o script alterna esse estado, como na demonstração da Fase 3. Quando a conexão volta, o buffer sai no monitor serial no JSON que a API aceita: `temp`, `bpm` e `umid`.
+A rede do simulador, `Wokwi-GUEST`, fica ligada o tempo todo: é ela que alcança a internet. O link com a API é outra chave, e começa desligado. Enquanto está desligado, a leitura entra num buffer de até 100 amostras. A cada 15 segundos o script alterna esse link, como na demonstração da Fase 3. Quando volta, cada amostra sai em `POST` para `https://chap01-phase07-cardioai.onrender.com/api/risco`, com `temp`, `bpm` e `umid`. O monitor serial continua mostrando a mesma linha.
 
 ### Backend (`backend/`)
 
@@ -51,9 +51,7 @@ No treino, a temperatura ficou em torno de 24 °C, e o pico só era marcado com 
 
 ### Portal web (`web/`)
 
-Portal em React + Vite, trazido das fases anteriores. O login é simulado: `medico@cardioia.com` / `123456` gera um token guardado no navegador e libera dashboard, pacientes, consultas, novo agendamento e o assistente. Pacientes e consultas leem registros fictícios em `src/services/mockData.js`. A página Assistente envia a frase para `POST /api/chat`. O `vercel.json` pede à Vercel que entregue `index.html` em qualquer endereço, para rotas como `/dashboard` abrirem direto.
-
-O cálculo de risco ao vivo ainda não aparece neste portal. Quem o mostra é o aplicativo.
+Portal em React + Vite, trazido das fases anteriores. O login é simulado: `medico@cardioia.com` / `123456` gera um token guardado no navegador e libera leituras, pacientes, consultas, novo agendamento e o assistente. Pacientes e consultas leem registros fictícios em `src/services/mockData.js`. A página Leituras envia os dois casos para `POST /api/risco`, guarda as últimas 20 respostas e abre o detalhe ao clicar: horário, temperatura, batimento, probabilidade, classe e protocolos. A página Assistente envia a frase para `POST /api/chat`. O `vercel.json` pede à Vercel que entregue `index.html` em qualquer endereço, para rotas como `/leituras` abrirem direto.
 
 ### Aplicativo (`mobile/`)
 
@@ -136,8 +134,7 @@ No [Wokwi](https://wokwi.com), crie um projeto MicroPython para ESP32 e use `iot
 
 ## Publicação
 
-Os links entram aqui quando o deploy estiver feito.
-
+- **API:** https://chap01-phase07-cardioai.onrender.com
 - **Web:** URL da Vercel
 - **Android:** link do APK no painel do Expo
 - **Simulação:** https://wokwi.com/projects/480298841772684289

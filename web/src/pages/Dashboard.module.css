@@ -10,13 +10,6 @@
   font-size: 1.8rem;
 }
 
-.statsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
 .section {
   background: white;
   border-radius: 10px;
@@ -25,23 +18,112 @@
 }
 
 .section h2 {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
   color: #2c3e50;
   font-size: 1.3rem;
 }
 
-.loading {
-  text-align: center;
-  padding: 3rem;
-  font-size: 1.2rem;
-  color: #7f8c8d;
+.explicacao,
+.vazio {
+  color: #5d6d7e;
+  margin-bottom: 1rem;
 }
 
-/* Responsividade do Dashboard */
-@media (max-width: 1024px) {
-  .statsGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.botao,
+.botaoAlerta {
+  border: 0;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 0.8rem 1.2rem;
+}
+
+.botao {
+  background: #667eea;
+}
+
+.botaoAlerta {
+  background: #e74c3c;
+}
+
+.botao:disabled,
+.botaoAlerta:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.erro {
+  color: #e74c3c;
+  margin-bottom: 1rem;
+}
+
+.contadores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.linha {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.4fr 1.2fr 0.8fr 0.8fr;
+  gap: 0.75rem;
+  text-align: left;
+  background: #f4f6fb;
+  border: 0;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  font: inherit;
+  color: #2c3e50;
+}
+
+.alto {
+  color: #e74c3c;
+  font-weight: 700;
+}
+
+.baixo {
+  color: #1e8449;
+  font-weight: 700;
+}
+
+.detalhe {
+  background: white;
+  border: 1px solid #e4e7ee;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  margin: -0.25rem 0 0.75rem;
+}
+
+.detalhe p,
+.detalhe li {
+  margin: 0.2rem 0;
+  color: #2c3e50;
+}
+
+.rotulo {
+  font-weight: 700;
+  margin-top: 0.6rem;
 }
 
 @media (max-width: 768px) {
@@ -54,11 +136,6 @@
     margin-bottom: 1rem;
   }
 
-  .statsGrid {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-
   .section {
     padding: 1rem;
   }
@@ -66,6 +143,10 @@
   .section h2 {
     font-size: 1.1rem;
     margin-bottom: 1rem;
+  }
+
+  .linha {
+    grid-template-columns: 1fr 1fr;
   }
 }
 

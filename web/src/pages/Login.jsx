@@ -19,7 +19,7 @@ export const Login = () => {
     const result = await login(email, password);
 
     if (result.success) {
-      navigate("/dashboard");
+      navigate("/leituras");
     } else {
       setError(result.error);
     }

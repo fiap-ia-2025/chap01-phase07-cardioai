@@ -22,16 +22,4 @@ export const api = {
     return newAppointment;
   },
 
-  getDashboardStats: async () => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    return {
-      totalPatients: mockPatients.length,
-      totalAppointments: mockAppointments.length,
-      criticalCases: mockPatients.filter((p) => p.riskLevel === "Crítico")
-        .length,
-      highRiskCases: mockPatients.filter((p) => p.riskLevel === "Alto").length,
-      todayAppointments: mockAppointments.filter((a) => a.date === "2024-03-20")
-        .length,
-    };
-  },
 };
