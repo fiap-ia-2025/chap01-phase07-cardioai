@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-from agentes import analisar, listar_historico
+from agentes import analisar, gerar_relatorio, listar_historico
 
 load_dotenv(Path(__file__).with_name(".env"))
 
@@ -110,6 +110,23 @@ def risco():
 @app.get("/api/historico")
 def historico():
     return jsonify({"leituras": listar_historico()})
+
+
+@app.post("/api/relatorio")
+def relatorio():
+    dados = request.get_json(silent=True) or {}
+    registrado_em = dados.get("registrado_em")
+    if not isinstance(registrado_em, str) or not registrado_em.strip():
+        return jsonify({"erro": "Envie o campo registrado_em da leitura."}), 400
+    try:
+        return jsonify(gerar_relatorio(registrado_em))
+    except KeyError:
+        return jsonify({"erro": "Essa leitura não está mais na lista. Atualize a página."}), 404
+    except ValueError as erro:
+        return jsonify({"erro": str(erro)}), 502
+    except RuntimeError as erro:
+        codigo = 503 if "OPENAI_API_KEY" in str(erro) else 502
+        return jsonify({"erro": str(erro)}), codigo
 
 
 @app.post("/api/chat")

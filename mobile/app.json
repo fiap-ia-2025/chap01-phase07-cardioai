@@ -6,6 +6,11 @@
     "orientation": "portrait",
     "android": {
       "package": "br.com.fiap.cardioia"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "fc18dfa5-eaa3-41f1-b15e-6d1d8a8f41a2"
+      }
     }
   }
 }

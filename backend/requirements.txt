@@ -4,8 +4,14 @@ gunicorn
 python-dotenv
 ibm-watson
 ibm-cloud-sdk-core
+# 2.45 exige um campo que o SDK dos agentes ainda não preenche.
+openai==2.44.0
+openai-agents==0.8.4
+# No Python 3.9, o SDK dos agentes precisa deste pacote para ler anotações de tipo.
+eval_type_backport
 pandas
 joblib
-# O .pkl foi salvo com scikit-learn 1.9.1. Essa versão pede Python 3.11 a 3.14.
-# No Python 3.9 o pip instala a série 1.6 e o carregamento avisa incompatibilidade.
-scikit-learn==1.9.1
+# O .pkl foi salvo com scikit-learn 1.9.1, que pede Python 3.11 a 3.14.
+# No Python 3.9 fica a série 1.6. O modelo abre, com aviso de versão.
+scikit-learn==1.9.1; python_version >= "3.11"
+scikit-learn==1.6.1; python_version < "3.11"

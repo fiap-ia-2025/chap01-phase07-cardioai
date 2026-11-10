@@ -16,6 +16,8 @@ export const Dashboard = () => {
   const [aberta, setAberta] = useState(null);
   const [atualizando, setAtualizando] = useState(false);
   const [erroApi, setErroApi] = useState("");
+  const [gerando, setGerando] = useState(null);
+  const [erroRelatorio, setErroRelatorio] = useState(null);
 
   const carregarLeituras = async () => {
     setAtualizando(true);
@@ -32,6 +34,40 @@ export const Dashboard = () => {
       setErroApi("Não foi possível buscar as leituras. Tente atualizar de novo.");
     } finally {
       setAtualizando(false);
+    }
+  };
+
+  const gerarRelatorio = async (registradoEm) => {
+    setGerando(registradoEm);
+    setErroRelatorio(null);
+    try {
+      const resposta = await fetch(`${API_URL}/api/relatorio`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ registrado_em: registradoEm }),
+      });
+      const dados = await resposta.json();
+      if (!resposta.ok) {
+        setErroRelatorio({
+          id: registradoEm,
+          texto: dados.erro || "Não foi possível gerar o relatório.",
+        });
+        return;
+      }
+      setLeituras((atuais) =>
+        atuais.map((item) =>
+          item.registrado_em === registradoEm
+            ? { ...item, relatorio_agente: dados.relatorio_agente }
+            : item
+        )
+      );
+    } catch {
+      setErroRelatorio({
+        id: registradoEm,
+        texto: "Não foi possível gerar o relatório. Tente de novo.",
+      });
+    } finally {
+      setGerando(null);
     }
   };
 
@@ -118,6 +154,33 @@ export const Dashboard = () => {
                               <li key={protocolo}>{protocolo}</li>
                             ))}
                           </ul>
+                        )}
+                        <p className={styles.rotulo}>Relatório dos agentes</p>
+                        {item.relatorio_agente ? (
+                          <p className={styles.relatorio}>{item.relatorio_agente}</p>
+                        ) : (
+                          <>
+                            <p>
+                              O texto repete a chance de pico, a classe e os protocolos
+                              desta leitura, e acrescenta um parágrafo para o plantão.
+                            </p>
+                            <button
+                              type="button"
+                              className={styles.botao}
+                              disabled={gerando === item.registrado_em}
+                              onClick={() => gerarRelatorio(item.registrado_em)}
+                            >
+                              {gerando === item.registrado_em
+                                ? "Gerando relatório..."
+                                : "Gerar relatório"}
+                            </button>
+                            {gerando === item.registrado_em ? (
+                              <p className={styles.dica}>Isso pode levar cerca de um minuto.</p>
+                            ) : null}
+                            {erroRelatorio?.id === item.registrado_em ? (
+                              <p className={styles.erro}>{erroRelatorio.texto}</p>
+                            ) : null}
+                          </>
                         )}
                       </div>
                     ) : null}

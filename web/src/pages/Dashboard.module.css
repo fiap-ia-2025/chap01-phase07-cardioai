@@ -133,6 +133,18 @@
   margin-top: 0.6rem;
 }
 
+.relatorio {
+  white-space: pre-wrap;
+  background: #f4f6fb;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  margin-top: 0.4rem;
+}
+
+.detalhe .botao {
+  margin-top: 0.6rem;
+}
+
 @media (max-width: 768px) {
   .dashboard {
     padding: 0.5rem;

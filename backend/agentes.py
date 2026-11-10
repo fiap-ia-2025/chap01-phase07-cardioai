@@ -17,6 +17,10 @@ from model import prever
 
 LIMITE_HISTORICO = 20
 
+
+class RelatorioInvalido(Exception):
+    """O texto dos agentes não repetiu a classificação oficial."""
+
 _historico = []
 
 
@@ -107,12 +111,17 @@ def _relatorio_agentes(saida):
     planejador = Agent(
         name="Agente Planejador de Resposta",
         instructions=(
-            "Compile o relatório no formato exato:\n"
+            "Compile o relatório em português, neste formato:\n"
             "RISCO PREVISTO: <probabilidade>\n"
             "CLASSIFICAÇÃO: <ALTO RISCO ou BAIXO RISCO>\n"
             "PROTOCOLOS SUGERIDOS:\n"
             "- <protocolo>\n"
-            "Use somente os números e protocolos recebidos. Não invente valores."
+            "LEITURA:\n"
+            "<um parágrafo para o plantão>\n"
+            "Copie a probabilidade, a classificação e os protocolos exatamente como "
+            "vieram nas ferramentas. Se a lista vier vazia, o único item é "
+            "'Nenhum protocolo acionado.' O parágrafo LEITURA explica a classe e "
+            "a ação de cada protocolo, sem número novo, sem paciente e sem sintoma."
         ),
     )
     especialista = Agent(
@@ -144,11 +153,13 @@ def _relatorio_agentes(saida):
 
     resultado = Runner.run_sync(
         orquestrador,
-        "Processe a análise deste caso. Os números oficiais estão nas ferramentas.",
+        "Processe a análise deste caso. Os números oficiais estão nas ferramentas "
+        "e repetidos aqui para conferência:\n"
+        + pacote,
     )
     texto = str(resultado.final_output).strip()
     if saida["classificacao"] not in texto:
-        raise ValueError("O relatório do agente não repetiu a classificação validada.")
+        raise RelatorioInvalido("O relatório do agente não repetiu a classificação validada.")
     return texto[:2000]
 
 
@@ -166,12 +177,27 @@ def analisar(dados):
         saida["umidade"] = previsao["umidade"]
 
     validar_saida(saida)
+    return registrar(saida)
 
-    if os.getenv("OPENAI_API_KEY"):
-        try:
-            saida["relatorio_agente"] = _relatorio_agentes(saida)
-        except Exception as erro:
-            saida["aviso_agente"] = f"Agentes indisponíveis: {erro}"
 
-    registrar(saida)
-    return saida
+def gerar_relatorio(registrado_em):
+    """Pede o texto dos quatro agentes para uma leitura que já está no histórico."""
+    item = next((atual for atual in _historico if atual["registrado_em"] == registrado_em), None)
+    if item is None:
+        raise KeyError(registrado_em)
+    if item.get("relatorio_agente"):
+        return item
+    if not os.getenv("OPENAI_API_KEY", "").strip():
+        raise RuntimeError("Os agentes precisam da variável OPENAI_API_KEY no servidor.")
+    try:
+        item["relatorio_agente"] = _relatorio_agentes(item)
+    except RelatorioInvalido:
+        raise ValueError("O relatório não repetiu a classificação desta leitura.")
+    except Exception as erro:
+        texto = str(erro)
+        if "invalid_api_key" in texto or "Incorrect API key" in texto:
+            raise RuntimeError(
+                "A chave da OpenAI foi recusada. Gere outra no painel da OpenAI e atualize OPENAI_API_KEY."
+            )
+        raise RuntimeError("Não foi possível consultar os agentes agora.")
+    return item

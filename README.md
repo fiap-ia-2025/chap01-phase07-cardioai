@@ -1,8 +1,8 @@
 # CardioIA
 
-Plataforma de apoio à decisão em cardiologia. Um sensor simulado mede temperatura e batimento, a API estima a chance de um pico de risco e indica os protocolos, e o médico acompanha o resultado no portal web e no aplicativo Android.
+O CardioIA é um protótipo acadêmico de apoio à decisão para um serviço de cardiologia. Um sensor simulado mede temperatura, batimento e umidade. Uma API em Python estima a chance de um pico de risco e lista os protocolos que se aplicam. O médico acompanha as leituras no portal web e no aplicativo Android, e pode tirar dúvidas em um chat.
 
-Dados e modelos são simulados, para uso acadêmico. O sistema não substitui avaliação clínica.
+Os pacientes, os sinais e o modelo são simulados. O sistema não faz diagnóstico e não substitui avaliação clínica.
 
 <p align="center">
   <a href="https://www.fiap.com.br/">
@@ -21,49 +21,111 @@ Dados e modelos são simulados, para uso acadêmico. O sistema não substitui av
 **Tutor:** Caique Nonato da Silva Bezerra  
 **Coordenador:** André Godoi
 
-## Fluxo
+## O que o sistema faz
 
-```text
-Sensor no Wokwi → API Python → modelo e protocolos → portal web e app Android
-```
+Quatro partes trabalham juntas:
 
-O sensor mede temperatura, batimento e umidade. A API completa os campos que o sensor não mede, consulta a árvore de decisão treinada na Fase 6 e devolve três informações: probabilidade de pico, classe (alto ou baixo risco) e protocolos acionados. O aplicativo e a página Leituras do portal consomem essa resposta em `/api/risco`. A página Assistente consome o chat em `/api/chat`. No Wokwi, o sensor guarda a leitura enquanto o link simulado está desligado. Quando o link volta, envia `temp`, `bpm` e `umid` para a API pública.
+- **Sensor.** Um circuito simulado no navegador, no [Wokwi](https://wokwi.com/projects/480298841772684289), lê temperatura e umidade e conta os pulsos de um botão como batimento. Um LED acende quando algum limite é ultrapassado. As leituras são enviadas à API.
+- **API.** Recebe a leitura, completa o que o sensor não mede, consulta o modelo e devolve a probabilidade de pico, a classe e os protocolos.
+- **Portal web.** Depois do login, a página Leituras mostra o que a API guardou. O Assistente responde perguntas sobre sintomas, triagem e emergência. Pacientes, consultas e novo agendamento formam uma clínica de exemplo, com registros fixos.
+- **Aplicativo Android.** Usa o mesmo login e a mesma lista de leituras.
 
-## Módulos
+O login, no portal e no aplicativo, é `medico@cardioia.com` / `123456`. Ele só libera a navegação. Não existe cadastro de usuários.
+
+## Como uma leitura chega na tela
+
+1. A cada 2 segundos, o programa lê o sensor de temperatura e umidade (DHT22) da placa simulada. O botão conta pulsos. A cada 5 segundos, essa contagem vira batimentos por minuto: pulsos na janela × 12. Sem pulsos, o batimento fica em 0.
+2. O LED acende se a temperatura passa de 38 °C, o batimento passa de 120 ou a umidade passa de 90%. Esse aviso fica no circuito. A classificação continua sendo feita pela API.
+3. O envio para a API liga e desliga a cada 15 segundos. Enquanto está desligado, a leitura espera numa fila de até 100 amostras. Quando liga, a amostra segue com três campos: `temp`, `bpm` e `umid`. A rede do simulador (`Wokwi-GUEST`) permanece ligada. Quem alterna é só o envio.
+4. A API recusa número fora da faixa. O batimento, por exemplo, precisa estar entre 0 e 250. Uma leitura recusada é descartada. Se a rede falha, a amostra continua na fila para a próxima tentativa.
+5. A API completa os campos que faltam, calcula a classe e os protocolos, e guarda a análise. O portal e o aplicativo leem essa lista em **Leituras**. O botão **Atualizar** busca o que chegou desde a última consulta. O clique numa linha abre horário, temperatura, batimento, probabilidade, classe e protocolos.
+
+A API guarda as últimas 20 análises na memória do processo. Quando o processo reinicia, a lista recomeça vazia.
+
+## Como a API decide
+
+Cada leitura produz duas respostas independentes.
+
+A **classe** vem de uma árvore de decisão treinada numa base simulada de 5.000 cenários de um serviço. O rótulo dessa base, chamado pico de risco, vale 1 quando pelo menos duas destas situações ocorrem ao mesmo tempo:
+
+- carga do sistema acima de 80%
+- tempo de espera acima de 60 minutos
+- saturação de oxigênio abaixo de 92%
+- frequência cardíaca acima de 110 bpm
+- mais de 4 eventos nas últimas 24 horas
+- disponibilidade de recursos abaixo de 40%
+
+A árvore devolve a probabilidade desse pico. A classe fica **ALTO RISCO** quando a árvore aponta o pico, e **BAIXO RISCO** no caso contrário. Na base, a temperatura representa o ambiente da simulação, em torno de 24 °C. Ela entra como dado, e não faz parte das seis situações acima.
+
+Os **protocolos** são regras escritas. Basta uma delas para entrar na lista:
+
+| Condição | Protocolo |
+| --- | --- |
+| Saturação abaixo de 88% | Suporte respiratório imediato |
+| Carga do sistema acima de 85% | Abrir unidades temporárias |
+| Frequência acima de 120 bpm | Monitoramento intensivo |
+| Mais de 5 eventos em 24 h | Equipe de resposta rápida |
+| Recursos abaixo de 30% | Redistribuir insumos |
+| Espera acima de 90 minutos | Triagem emergencial |
+| Temperatura acima de 38 °C | Protocolo infeccioso |
+| Densidade de eventos acima de 6 | Plano de contingência |
+| Pressão sistólica abaixo de 90 | Protocolo de choque |
+| Classe ALTO RISCO | Estado de emergência |
+
+Por isso as duas respostas podem divergir. Uma leitura com batimento de 132 e os demais campos no cenário calmo permanece em **BAIXO RISCO**, porque só uma das seis situações do treino está presente. O protocolo de monitoramento entra na lista, porque a frequência passou de 120.
+
+### O que o sensor mede e o que a API completa
+
+O modelo usa dez campos. O sensor envia temperatura, batimento e umidade. A umidade fica registrada na resposta e fica de fora do modelo. Cada campo ausente recebe o valor abaixo, e a resposta informa o que foi preenchido.
+
+| Campo | Significado | Valor quando o sensor não envia |
+| --- | --- | --- |
+| `idade_media` | Idade média dos pacientes | 55 |
+| `carga_sistema` | Ocupação do serviço, de 0 a 100 | 50 |
+| `tempo_espera` | Espera em minutos | 30 |
+| `fc_media` | Frequência cardíaca | 80, ou o `bpm` enviado |
+| `spo2_media` | Saturação de oxigênio | 97 |
+| `pa_sistolica` | Pressão sistólica | 120 |
+| `temperatura` | Temperatura em °C | 24, ou o `temp` enviado |
+| `densidade_eventos` | Concentração de eventos | 2 |
+| `eventos_24h` | Eventos nas últimas 24 horas | 1 |
+| `disponibilidade_recursos` | Recursos disponíveis, de 0 a 100 | 70 |
+
+O número exibido nas telas é o da árvore e o das regras da tabela. No detalhe de uma leitura, **Gerar relatório** pede um texto a quatro agentes: o orquestrador encaminha o caso, o analista lê a probabilidade e a classe já calculadas, o especialista lê os protocolos já verificados e o planejador escreve o relatório. O texto repete esses dados e acrescenta um parágrafo de leitura para o plantão. Os agentes não calculam outro risco. Sem `OPENAI_API_KEY` no servidor, o botão avisa que eles estão indisponíveis.
+
+### Assistente
+
+A página Assistente envia a frase para `POST /api/chat`. Com as credenciais da IBM no servidor, a resposta vem do Watson Assistant. Sem essas credenciais, ou quando a IBM não responde, a API usa textos locais sobre sintomas de infarto, triagem e emergência (SAMU 192). Toda resposta local lembra que o conteúdo é acadêmico.
+
+## Estrutura do repositório
+
+| Pasta | Conteúdo |
+| --- | --- |
+| `iot/` | Programa do sensor em MicroPython e o circuito do Wokwi |
+| `backend/` | API, modelo treinado e regras de protocolo |
+| `web/` | Portal em React + Vite |
+| `mobile/` | Aplicativo em Expo |
+| `docs/` | Pasta reservada ao relatório em PDF |
 
 ### Sensor (`iot/`)
 
-`main.py` é a lógica da Fase 3, antes escrita em C++ para ESP32, reescrita em MicroPython. `diagram.json` é o circuito do Wokwi.
-
-A cada 2 segundos o script lê temperatura e umidade no DHT22. O botão conta pulsos. A cada 5 segundos essa contagem vira batimentos por minuto (pulsos × 12). Acima de 38 °C, 120 bpm ou 90% de umidade, o LED acende.
-
-A rede do simulador, `Wokwi-GUEST`, fica ligada o tempo todo: é ela que alcança a internet. O link com a API é outra chave, e começa desligado. Enquanto está desligado, a leitura entra num buffer de até 100 amostras. A cada 15 segundos o script alterna esse link, como na demonstração da Fase 3. Quando volta, cada amostra sai em `POST` para `https://chap01-phase07-cardioai.onrender.com/api/risco`, com `temp`, `bpm` e `umid`. O monitor serial continua mostrando a mesma linha.
+`main.py` roda na placa ESP32 simulada. `diagram.json` descreve o circuito: a placa, o DHT22, o botão e o LED. O projeto público está em https://wokwi.com/projects/480298841772684289.
 
 ### Backend (`backend/`)
 
-`model.py` carrega `cardioia_modelo_risco.pkl`, a árvore de decisão da Fase 6. Ela espera dez campos: idade média, carga do sistema, tempo de espera, frequência cardíaca, SpO2, pressão sistólica, temperatura, densidade de eventos, eventos em 24 h e disponibilidade de recursos. O sensor mede três. A umidade fica registrada na resposta e não entra no modelo. Cada campo que não veio na requisição recebe um valor de cenário calmo, e a resposta lista o que foi preenchido. Número fora da faixa é recusado.
+`model.py` carrega `cardioia_modelo_risco.pkl`, valida a faixa de cada número e consulta a árvore. `agentes.py` monta os protocolos, confere se a resposta tem probabilidade entre 0 e 1, classe válida e lista de protocolos, guarda o histórico e, sob pedido, chama os quatro agentes. `app.py` publica isso em HTTP. As chaves do Watson e da OpenAI ficam em `backend/.env`, que não entra no Git. Os nomes esperados estão em `backend/.env.example`.
 
-`agentes.py` aplica, sobre esses dez números, as dez regras de protocolo da Fase 6. A resposta só segue adiante se tiver probabilidade entre 0 e 1, classe alto ou baixo risco, e uma lista de protocolos. As últimas 20 análises ficam em memória. Os quatro agentes da Fase 6 (orquestrador, analista de risco, especialista em protocolos e planejador) só escrevem um relatório se `OPENAI_API_KEY` estiver definida. O número mostrado na tela é o da árvore.
+### Portal (`web/`)
 
-`app.py` publica essas funções em HTTP. No chat, a frase segue para o Watson da Fase 5 quando `WATSON_API_KEY`, `WATSON_URL`, `WATSON_ASSISTANT_ID` e `WATSON_ENVIRONMENT_ID` estão no ambiente. Sem essas variáveis, ou se a IBM não responder, entram os textos locais sobre sintomas de infarto, triagem e emergência (SAMU 192). A chave fica em `backend/.env` e não vai para o Git.
-
-No treino, a temperatura ficou em torno de 24 °C, e o pico só era marcado com pelo menos duas condições da base ao mesmo tempo. O protocolo de febre usa 38 °C. Um batimento de 132 bpm, com o restante calmo, aciona o monitoramento e a árvore permanece em baixo risco.
-
-### Portal web (`web/`)
-
-Portal em React + Vite, trazido das fases anteriores. O login é simulado: `medico@cardioia.com` / `123456` gera um token guardado no navegador e libera leituras, pacientes, consultas, novo agendamento e o assistente. Pacientes e consultas leem registros fictícios em `src/services/mockData.js`. A página Leituras lista o que o sensor enviou para `POST /api/risco`. O clique abre horário, temperatura, batimento, probabilidade, classe e protocolos. A página Assistente envia a frase para `POST /api/chat`. O `vercel.json` pede à Vercel que entregue `index.html` em qualquer endereço, para rotas como `/leituras` abrirem direto.
+React + Vite. O `vercel.json` faz a Vercel entregar `index.html` em qualquer endereço, para uma rota como `/leituras` abrir direto. Pacientes e consultas leem `src/services/mockData.js`.
 
 ### Aplicativo (`mobile/`)
 
-App Expo criado nesta fase, com o mesmo login do portal. Depois de entrar, a tela de dados cardíacos oferece duas leituras. "Leitura estável" envia 36,5 °C e 78 bpm. "Sinais acima do limite" envia 38,6 °C e 132 bpm. As duas chamam `POST /api/risco` e mostram classe, probabilidade e protocolos.
+Expo, com o mesmo login do portal. `app.json` identifica o Android como `br.com.fiap.cardioia`. `eas.json`, no perfil `preview`, gera um APK instalável fora da Play Store.
 
-`app.json` identifica o Android como `br.com.fiap.cardioia`. `eas.json`, no perfil `preview`, pede um APK instalável fora da Play Store.
+## Como executar
 
-## Executar
-
-Requisitos: Python 3.10 ou superior e Node.js. O modelo foi salvo com scikit-learn 1.9.1. Python 3.9 carrega o arquivo com aviso de versão.
-
-Suba a API antes do portal e do aplicativo.
+Requisitos: Python 3.10 ou superior e Node.js. O modelo foi salvo com scikit-learn 1.9.1. Python 3.9 abre o arquivo com aviso de versão.
 
 ### API
 
@@ -75,16 +137,17 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Disponível em `http://127.0.0.1:5000`.
+A API fica em `http://127.0.0.1:5000`. A raiz do servidor não tem página. A verificação é `GET /api/saude`.
 
-| Método | Rota | Retorno |
+| Método | Rota | Função |
 | --- | --- | --- |
-| `POST` | `/api/risco` | Probabilidade, classe e protocolos |
-| `GET` | `/api/historico` | Últimas 20 análises |
-| `POST` | `/api/chat` | Orientação sobre sintomas, triagem ou emergência |
-| `GET` | `/api/saude` | Confirma que a API está no ar |
+| `POST` | `/api/risco` | Recebe a leitura e devolve probabilidade, classe e protocolos |
+| `GET` | `/api/historico` | Devolve as últimas 20 análises, da mais antiga para a mais recente |
+| `POST` | `/api/relatorio` | Pede o texto dos agentes para uma leitura já guardada |
+| `POST` | `/api/chat` | Responde uma frase sobre sintomas, triagem ou emergência |
+| `GET` | `/api/saude` | Informa que a API está no ar e qual modelo está carregado |
 
-### Portal web
+### Portal
 
 ```bash
 cd web
@@ -92,9 +155,7 @@ npm install
 npm run dev
 ```
 
-Acesse `http://localhost:5173`.
-
-Login, também usado no aplicativo: `medico@cardioia.com` / `123456`.
+Abra `http://localhost:5173`. Sem a variável `VITE_API_URL`, o portal local usa `http://127.0.0.1:5000`.
 
 ### Aplicativo
 
@@ -104,38 +165,27 @@ npm install
 npx expo start
 ```
 
-Abra com o aplicativo Expo Go, no mesmo Wi-Fi do computador. No celular, `127.0.0.1` é o próprio aparelho. Para as leituras chegarem na API que está no computador, suba o Expo com o IP da máquina:
+O aplicativo consulta a API publicada. Para usar a API do computador, informe o IP da máquina. No celular, `127.0.0.1` é o próprio aparelho.
 
 ```bash
 EXPO_PUBLIC_API_URL=http://SEU_IP:5000 npx expo start
 ```
 
-O APK para instalar no celular é gerado na nuvem do Expo, no perfil `preview`:
+O Expo Go, na mesma rede do computador, abre o projeto durante o desenvolvimento. O APK é gerado na nuvem do Expo:
 
 ```bash
 eas build -p android --profile preview
 ```
 
-O identificador Android é `br.com.fiap.cardioia`.
-
 ### Sensor
 
-No [Wokwi](https://wokwi.com), crie um projeto MicroPython para ESP32 e use `iot/diagram.json` e `iot/main.py`. O circuito, o buffer e os limites do LED estão descritos em Módulos.
+No Wokwi, abra o [projeto público](https://wokwi.com/projects/480298841772684289) ou crie um projeto MicroPython para ESP32 e cole `iot/diagram.json` e `iot/main.py`. O monitor serial mostra a leitura, o estado do envio e a resposta da API.
 
-## Repositório
-
-| Pasta | Conteúdo |
-| --- | --- |
-| `web/` | Portal em React + Vite e `vercel.json` para as rotas da aplicação |
-| `mobile/` | Aplicativo Expo, `app.json` e `eas.json` |
-| `backend/` | API, modelo `cardioia_modelo_risco.pkl`, validação da previsão e protocolos |
-| `iot/` | Código MicroPython e circuito do Wokwi |
-| `docs/` | Pasta do relatório em PDF. O arquivo ainda não está no repositório |
-
-## Publicação
+## Onde está publicado
 
 - **API:** https://chap01-phase07-cardioai.onrender.com
-- **Web:** URL da Vercel
-- **Android:** link do APK no painel do Expo
-- **Simulação:** https://wokwi.com/projects/480298841772684289
-- **Relatório:** `docs/`
+- **Portal:** o endereço da Vercel entra aqui
+- **Aplicativo:** o link do APK entra aqui
+- **Sensor:** https://wokwi.com/projects/480298841772684289
+
+A instância gratuita da API adormece depois de um tempo sem uso. A primeira chamada pode levar cerca de um minuto, e a lista de leituras volta vazia depois que o processo reinicia.
