@@ -187,6 +187,7 @@ No Wokwi, abra o [projeto público](https://wokwi.com/projects/48029884177268428
 - **Portal:** https://chap01-phase07-cardioai.vercel.app
 - **Aplicativo:** https://expo.dev/accounts/biancansantacruz/projects/cardioia/builds/0141d232-21a7-40b3-995e-1434833ed801
 - **Sensor:** https://wokwi.com/projects/480298841772684289
+- **Vídeo:** https://youtu.be/ohYkkbLN7ts
 
 No celular Android, abra o link do aplicativo, baixe o APK e confirme a instalação. O login é `medico@cardioia.com` / `123456`.
 

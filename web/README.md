@@ -173,7 +173,7 @@ No contexto de um pronto-socorro cardiológico, muitos pacientes chegam com quei
 
 ## 🎥 Vídeo de Demonstração
 
-[![CardioIA Portal - Demonstração](https://img.youtube.com/vi/vxSZyMZO1Zo/hqdefault.jpg)](https://youtu.be/vxSZyMZO1Zo)
+[![CardioIA — demonstração](https://img.youtube.com/vi/ohYkkbLN7ts/hqdefault.jpg)](https://youtu.be/ohYkkbLN7ts)
 
 *Clique na imagem para assistir ao vídeo*
 
