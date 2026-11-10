@@ -1,10 +1,11 @@
 flask
 flask-cors
+gunicorn
 python-dotenv
 ibm-watson
 ibm-cloud-sdk-core
 pandas
 joblib
-# O .pkl foi salvo com scikit-learn 1.9.1, que exige Python 3.10+.
+# O .pkl foi salvo com scikit-learn 1.9.1. Essa versão pede Python 3.11 a 3.14.
 # No Python 3.9 o pip instala a série 1.6 e o carregamento avisa incompatibilidade.
-scikit-learn
+scikit-learn==1.9.1
