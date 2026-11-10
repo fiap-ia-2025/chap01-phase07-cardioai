@@ -184,8 +184,10 @@ No Wokwi, abra o [projeto público](https://wokwi.com/projects/48029884177268428
 ## Onde está publicado
 
 - **API:** https://chap01-phase07-cardioai.onrender.com
-- **Portal:** o endereço da Vercel entra aqui
-- **Aplicativo:** o link do APK entra aqui
+- **Portal:** https://chap01-phase07-cardioai-kzxb0ya9s-bianca-santa-cruz.vercel.app/leituras
+- **Aplicativo:** https://expo.dev/accounts/biancansantacruz/projects/cardioia/builds/0141d232-21a7-40b3-995e-1434833ed801
 - **Sensor:** https://wokwi.com/projects/480298841772684289
+
+No celular Android, abra o link do aplicativo, baixe o APK e confirme a instalação. O login é `medico@cardioia.com` / `123456`.
 
 A instância gratuita da API adormece depois de um tempo sem uso. A primeira chamada pode levar cerca de um minuto, e a lista de leituras volta vazia depois que o processo reinicia.
