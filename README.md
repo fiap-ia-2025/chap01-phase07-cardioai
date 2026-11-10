@@ -91,7 +91,7 @@ O modelo usa dez campos. O sensor envia temperatura, batimento e umidade. A umid
 | `eventos_24h` | Eventos nas últimas 24 horas | 1 |
 | `disponibilidade_recursos` | Recursos disponíveis, de 0 a 100 | 70 |
 
-O número exibido nas telas é o da árvore e o das regras da tabela. No detalhe de uma leitura, **Gerar relatório** pede um texto a quatro agentes: o orquestrador encaminha o caso, o analista lê a probabilidade e a classe já calculadas, o especialista lê os protocolos já verificados e o planejador escreve o relatório. O texto repete esses dados e acrescenta um parágrafo de leitura para o plantão. Os agentes não calculam outro risco. Sem `OPENAI_API_KEY` no servidor, o botão avisa que eles estão indisponíveis.
+O número exibido nas telas é o da árvore e o das regras da tabela. No detalhe de uma leitura, **Gerar relatório** pede um texto a quatro agentes: o orquestrador encaminha o caso, o analista lê a probabilidade e a classe já calculadas, o especialista lê os protocolos já verificados e o planejador escreve o relatório. O texto repete esses dados. O parágrafo diz o que foi medido, o que a API completou, por que a classe ficou assim e a ação de cada protocolo. Os agentes não calculam outro risco. Sem `OPENAI_API_KEY` no servidor, o botão avisa que eles estão indisponíveis.
 
 ### Assistente
 

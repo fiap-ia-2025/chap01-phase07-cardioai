@@ -161,8 +161,9 @@ export const Dashboard = () => {
                         ) : (
                           <>
                             <p>
-                              O texto repete a chance de pico, a classe e os protocolos
-                              desta leitura, e acrescenta um parágrafo para o plantão.
+                              O texto repete a chance de pico, a classe e os protocolos.
+                              O parágrafo diz o que foi medido, o que a API completou
+                              e a ação de cada protocolo.
                             </p>
                             <button
                               type="button"

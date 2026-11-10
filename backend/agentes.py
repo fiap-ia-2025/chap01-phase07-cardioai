@@ -74,6 +74,7 @@ def registrar(saida):
         "classificacao": saida["classificacao"],
         "protocolos": list(saida["protocolos"]),
         "valores": dict(saida["valores"]),
+        "campos_preenchidos": list(saida.get("campos_preenchidos", [])),
     }
     if "umidade" in saida:
         item["umidade"] = saida["umidade"]
@@ -89,14 +90,16 @@ def listar_historico():
 def _relatorio_agentes(saida):
     from agents import Agent, Runner, function_tool
 
-    pacote = json.dumps(
-        {
-            "risco_previsto": saida["risco_previsto"],
-            "classificacao": saida["classificacao"],
-            "protocolos": saida["protocolos"],
-        },
-        ensure_ascii=False,
-    )
+    oficial = {
+        "risco_previsto": saida["risco_previsto"],
+        "classificacao": saida["classificacao"],
+        "protocolos": saida["protocolos"],
+        "valores": saida.get("valores", {}),
+        "campos_preenchidos": saida.get("campos_preenchidos", []),
+    }
+    if "umidade" in saida:
+        oficial["umidade"] = saida["umidade"]
+    pacote = json.dumps(oficial, ensure_ascii=False)
 
     @function_tool
     def calcular_score_risco() -> str:
@@ -117,11 +120,26 @@ def _relatorio_agentes(saida):
             "PROTOCOLOS SUGERIDOS:\n"
             "- <protocolo>\n"
             "LEITURA:\n"
-            "<um parágrafo para o plantão>\n"
+            "<quatro frases para o plantão>\n"
             "Copie a probabilidade, a classificação e os protocolos exatamente como "
             "vieram nas ferramentas. Se a lista vier vazia, o único item é "
-            "'Nenhum protocolo acionado.' O parágrafo LEITURA explica a classe e "
-            "a ação de cada protocolo, sem número novo, sem paciente e sem sintoma."
+            "'Nenhum protocolo acionado.'\n"
+            "Nas quatro frases, use só números que já estão no pacote. "
+            "A primeira diz o que foi medido: os campos de valores que não estão "
+            "em campos_preenchidos e, se existir, a umidade. "
+            "A segunda diz o que a API completou: cada nome em campos_preenchidos "
+            "e o valor correspondente. "
+            "A terceira explica a classe: o pico só existe quando duas destas "
+            "condições acontecem juntas — carga acima de 80, espera acima de 60, "
+            "saturação abaixo de 92, frequência acima de 110, mais de 4 eventos "
+            "em 24 horas, recursos abaixo de 40. "
+            "A quarta diz a ação de cada protocolo que já está na lista, sem criar outro. "
+            "Não invente paciente nem sintoma. Traduza os nomes: "
+            "idade_media é idade média, carga_sistema é carga do serviço, "
+            "tempo_espera é espera em minutos, fc_media é frequência cardíaca, "
+            "spo2_media é saturação, pa_sistolica é pressão sistólica, "
+            "temperatura é temperatura, densidade_eventos é densidade de eventos, "
+            "eventos_24h é eventos em 24 horas, disponibilidade_recursos é recursos disponíveis."
         ),
     )
     especialista = Agent(
